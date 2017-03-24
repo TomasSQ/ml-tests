@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -12,20 +13,26 @@ import java.util.stream.Stream;
 
 class FacesReader {
 
-	private static final String FACES_TXT = "faces.txt";
+	private static final String FACES_TXT = "faces_01.csv";
 
-	static List<Rectangle> getFaces() {
-		JsonArray facesJson = facesAsJson(readFaces());
-		List<Rectangle> faces = new ArrayList<>();
+	static List<Face> getDefault() {
+		List<Face> faces = new ArrayList<>();
+		readFaces().forEach(faceStr -> {
+			String[] faceArr = faceStr.split(",");
 
-		facesJson.forEach(elem -> faces.add(faceJsonAsRectangle(elem.getAsJsonArray())));
+			BufferedImage image = ImageReader.getImage(faceArr[0].replace("./src/main/resources/", ""));
+			if (image.getHeight() < image.getWidth()) {
+				Rectangle r = new Rectangle(Integer.parseInt(faceArr[1]), Integer.parseInt(faceArr[2]), Integer.parseInt(faceArr[3]), Integer.parseInt(faceArr[4]));
+				faces.add(new Face(r, image));
+			}
+		});
 
 		return faces;
 	}
 
-	private static java.util.List<String> readFaces() {
+	private static List<String> readFaces() {
 		try (Stream<String> stream = Files.lines(Paths.get(ClassLoader.getSystemResource(FACES_TXT).toURI()))) {
-			java.util.List<String> faces = new ArrayList<>();
+			List<String> faces = new ArrayList<>();
 			stream.forEach(faces::add);
 
 			return faces;
@@ -34,17 +41,4 @@ class FacesReader {
 		}
 	}
 
-	private static Rectangle faceJsonAsRectangle(JsonArray faceJson) {
-		int minX = faceJson.get(0).getAsJsonObject().get("x").getAsInt();
-		int minY = faceJson.get(0).getAsJsonObject().get("y").getAsInt();
-		int maxX = faceJson.get(2).getAsJsonObject().get("x").getAsInt();
-		int maxY = faceJson.get(2).getAsJsonObject().get("y").getAsInt();
-		return new Rectangle(minX, minY, maxX - minX, maxY - minY);
-	}
-
-	private static JsonArray facesAsJson(java.util.List<String> faces) {
-		JsonArray facesJson = new JsonArray();
-		faces.forEach(face -> facesJson.add(new JsonParser().parse(face)));
-		return facesJson;
-	}
 }

@@ -15,6 +15,14 @@ class ImageReader {
 		return images;
 	}
 
+	static BufferedImage getImage(String name) {
+		try {
+			return ImageIO.read(ImageReader.class.getClassLoader().getResourceAsStream(name));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private static BufferedImage readImage(int i) {
 		try {
 			return ImageIO.read(ImageReader.class.getClassLoader().getResourceAsStream(String.format("%02d.jpg", i)));
