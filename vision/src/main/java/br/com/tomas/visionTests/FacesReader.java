@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 class FacesReader {
 
-	private static final String FACES_TXT = "faces_01.csv";
+	private static final String FACES_TXT = "faces_02.csv";
 
 	static List<Face> getDefault() {
 		List<Face> faces = new ArrayList<>();
@@ -22,7 +22,11 @@ class FacesReader {
 
 			BufferedImage image = ImageReader.getImage(faceArr[0].replace("./src/main/resources/", ""));
 			if (image.getHeight() < image.getWidth()) {
-				Rectangle r = new Rectangle(Integer.parseInt(faceArr[1]), Integer.parseInt(faceArr[2]), Integer.parseInt(faceArr[3]), Integer.parseInt(faceArr[4]));
+				int x = Integer.parseInt(faceArr[1]);
+				int y = Integer.parseInt(faceArr[2]);
+				int x1 = Integer.parseInt(faceArr[3]);
+				int y1 = Integer.parseInt(faceArr[4]);
+				Rectangle r = new Rectangle(x, y, x1 - x, y1 - y);
 				faces.add(new Face(r, image));
 			}
 		});

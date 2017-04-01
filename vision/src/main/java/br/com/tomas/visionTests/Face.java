@@ -16,24 +16,28 @@ public class Face {
 		this.image = image;
 	}
 
-	public Face scale(int width, int height) {
-		double widthRatio = 1.0d * width / image.getWidth();
-		double heightRatio = 1.0d * height / image.getHeight();
-		face = new Rectangle((int) (face.x * widthRatio), (int) (face.y * heightRatio), (int) (face.width * widthRatio), (int) (face.height * heightRatio));
+	public Face scale(int width) {
+		double scale = 1.0d * width / image.getWidth();
 
-		BufferedImage resized = new BufferedImage(width, height, image.getType());
+		face = new Rectangle((int) (face.x * scale), (int) (face.y * scale), (int) (face.width * scale), (int) (face.height * scale));
+
+		BufferedImage resized = new BufferedImage(width, (int) (image.getHeight() * scale), image.getType());
 		Graphics2D g = resized.createGraphics();
-		g.drawImage(image, 0, 0, width, height, null);
+		g.drawImage(image, 0, 0, width, (int) (image.getHeight() * scale), null);
 		g.dispose();
 		image = resized;
 
 		return this;
 	}
 
-	public Face move(Point start, Dimension dimension) {
+	public Face move(Point middle, Dimension dimension) {
 		BufferedImage moved = new BufferedImage(dimension.width, dimension.height, image.getType());
 		Graphics2D g = moved.createGraphics();
-		g.drawImage(image, start.x - face.x, start.y - face.y, image.getWidth(), image.getHeight(), null);
+		int middleFaceX = (int) (face.x + face.width / 2.0);
+		int middleFaceY = (int) (face.y + face.height / 2.0);
+		int dx = middle.x - middleFaceX;
+		int dy = middle.y - middleFaceY;
+		g.drawImage(image, dx, dy, image.getWidth(), image.getHeight(), null);
 		g.dispose();
 		image = moved;
 
